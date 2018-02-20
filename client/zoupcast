@@ -1,0 +1,7 @@
+#!/bin/sh -eu
+if test $# -ne 2; then
+    echo "Usage: $0 LISTEN_PORT REMOTE_SERVER" >&2
+    exit 1
+fi
+
+socat TCP-LISTEN:$1,reuseaddr,fork "EXEC:ssh -T $2 zoupcast/server/receive_icecast,nofork"

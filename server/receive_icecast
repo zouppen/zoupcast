@@ -1,0 +1,47 @@
+#!/usr/bin/env php
+<?php
+$tmpfile = tempnam("/tmp/", "putkitus-");
+ob_start();
+
+$msg = new http\Message(STDIN, FALSE);
+$url = new http\Url($msg->getRequestUrl());
+$qs = new http\QueryString($url->query);
+
+#GET /admin/metadata?mode=updinfo&mount=/fm.ogg&charset=&artist=Wolfgang%20Petry&title=Der%20%22nie%20genug
+$is_update = $qs->getString('mode') === 'updinfo';
+$is_stream = $msg->getRequestMethod() === 'PUT' || $msg->getRequestMethod() === 'SOURCE';
+
+if ($is_update) {
+    $np = "{$qs->getString('artist')} - {$qs->getString('title')}";
+    print("NYTSOI: $np\n");
+} elseif ($is_stream) {
+    $name = $msg->getHeader("Ice-Name");
+    $fmt = $msg->getHeader('Content-Type');
+    print("NIMI: $name\n");    
+    print("TYYPPI: $fmt\n");    
+} else {
+    print("OUTO\n");
+}
+
+file_put_contents($tmpfile, ob_get_contents());
+ob_end_clean();
+
+if ($is_update) {
+    print("HTTP/1.0 200 OK\r\n\r\n");
+} elseif ($is_stream) {
+    print("HTTP/1.0 200 OK\r\n\r\n");    
+    passthru("cat >$tmpfile.ogg");
+} else {
+    print(
+        "HTTP/1.0 400 Bad Request\r\n\r\n<!doctype html>\n<html lang=en>".
+        "<head><meta charset=utf-8><title>Zoupcast</title></head>".
+        "<h1>Zoupcast</h1><p>This means you have Zoupcast up and running. ".
+        "Use the following parameters on Icecast client:</p><ul>".
+        "<li>Vorbis codec".
+        "<li>Use UTF-8 for metadata".
+        "<li>Rather high quality (>=160kbps)".
+        "<li>Any username and password".
+        "<li>Any mount point".
+        "</ul>"
+    );
+}
