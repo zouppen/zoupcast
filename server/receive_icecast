@@ -30,7 +30,7 @@ if ($is_update) {
     print("HTTP/1.0 200 OK\r\n\r\n");
 } elseif ($is_stream) {
     print("HTTP/1.0 200 OK\r\n\r\n");    
-    passthru("cat >$tmpfile.ogg");
+    passthru("sox -t vorbis - -r 192000 -t raw - | jack-stdin -S 960000 stereo_tool:in_l stereo_tool:in_r");
 } else {
     print(
         "HTTP/1.0 400 Bad Request\r\n\r\n<!doctype html>\n<html lang=en>".
