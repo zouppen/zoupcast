@@ -3,15 +3,54 @@ Icecast to JACK output over SSH
 
 ## Requirements
 
-Client:
+### Client
 
-* socat
+```sh
+sudo apt install socat
+```
 
-Server:
+### Server
 
-* sox
-* php-http
-* php-cli
-* jack-stdin
+```sh
+sudo apt install sox php-http php-cli jack-stdin
+```
+
+TODO server side requires patched jack-stdin and some weird
+scripts. They should be published as well.
 
 (Note: No HTTP server setup is needed!)
+
+## Broadcasting
+
+First, deliver your public key to server administrator.
+
+Edit `~/.ssh/config` and add the following server entry:
+
+```
+Host broadcast
+	hostname yourserver.example.com
+	port 2222 # You need this only if running ssh on non-standard port
+	user broadcast
+	identityfile /path/to/your/private_key
+```
+
+To run, you need local port number and ssh hostname:
+
+```
+client/zoupcast 8000 broadcast
+```
+
+Then, check your server is running by navigating to
+http://localhost:8000/ with your browser. If it shows instructions
+page, then you have a remote connection!
+
+Then open your Icecast client such as Mixxx and use the following
+settings:
+
+* Vorbis codec
+* Use UTF-8 for metadata
+* Rather high quality (>=160kbps)
+* Any username and password
+* Any mount point
+
+Enjoy!
