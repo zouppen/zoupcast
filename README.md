@@ -29,7 +29,8 @@ Edit `~/.ssh/config` and add the following server entry:
 ```
 Host broadcast
 	hostname yourserver.example.com
-	port 2222 # You need this only if running ssh on non-standard port
+	# You need this the following only if running ssh on non-standard port
+	port 2222
 	user broadcast
 	identityfile /path/to/your/private_key
 ```
@@ -40,7 +41,7 @@ To run, you need local port number and ssh hostname:
 client/zoupcast 8000 broadcast
 ```
 
-Then, check your server is running by navigating to
+Then, check if you have connection by navigating to
 http://localhost:8000/ with your browser. If it shows instructions
 page, then you have a remote connection!
 
@@ -52,5 +53,8 @@ settings:
 * Rather high quality (>=160kbps)
 * Any username and password
 * Any mount point
+
+Zoupcast can be started in advance and it doesn't interfere the
+broadcast until you start streaming from the Icecast client.
 
 Enjoy!
