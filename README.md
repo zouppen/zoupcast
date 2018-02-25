@@ -12,11 +12,11 @@ sudo apt install socat
 ### Server
 
 ```sh
-sudo apt install sox php-http php-cli jack-stdin
+sudo apt install php-http php-cli vlc-bin vlc-jack
 ```
 
-TODO server side requires patched jack-stdin and some weird
-scripts. They should be published as well.
+TODO server side requires some weird scripts not yet included in this
+repo. They should be published as well.
 
 (Note: No HTTP server setup is needed!)
 

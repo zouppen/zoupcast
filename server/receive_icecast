@@ -31,8 +31,8 @@ if ($is_update) {
     print("HTTP/1.0 200 OK\r\n\r\n");
     // Listen to input and route using JACK
     register_shutdown_function('shutdown');
-    passthru("/home/broadcast/switch_input --sleep live >/dev/null &");
-    passthru("sox -t vorbis - -r 192000 -t raw - | /home/broadcast/jack-stdin -n live -S 960000 null null");
+    passthru("/home/broadcast/switch_input --sleep vlc >/dev/null &");
+    passthru("exec cvlc -A jack - --no-jack-auto-connect --play-and-exit");
 } else {
     print(
         "HTTP/1.0 400 Bad Request\r\n\r\n<!doctype html>\n<html lang=en>".
