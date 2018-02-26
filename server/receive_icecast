@@ -1,12 +1,16 @@
 #!/usr/bin/env php
 <?php
 function shutdown() {
+    update_meta([
+        'programme' => "Instanssin taustasäteily",
+        'idle' => true,
+    ]);
     passthru('systemctl --user start radiotext.service');
-    passthru("/home/broadcast/switch_input background");
+    passthru("/home/broadcast/tools/switch_input background");
 }
 
 function update_meta($song) {
-    passthru('/home/broadcast/radiotext '.escapeshellarg($song));
+    passthru('/home/broadcast/tools/radiotext '.escapeshellarg(json_encode($song)));
 }
 
 $msg = new http\Message(STDIN, FALSE);
@@ -18,21 +22,24 @@ $is_stream = $msg->getRequestMethod() === 'PUT' || $msg->getRequestMethod() === 
 
 if ($is_update) {
     // Collect artist name
-    $np = "{$qs->getString('artist')} - {$qs->getString('title')}";
-    update_meta($np);
+    update_meta([
+        'artist' => $qs->getString('artist'),
+        'title'  => $qs->getString('title'),
+    ]);
     // Answer OK
     print("HTTP/1.0 200 OK\r\n\r\n");
 } elseif ($is_stream) {
     // Collect stream name
-    $name = $msg->getHeader("Ice-Name");
     passthru('systemctl --user stop radiotext.service');
-    update_meta($name);
+    update_meta([
+        'programme' => $msg->getHeader("Ice-Name")
+    ]);
     // Answer OK
     print("HTTP/1.0 200 OK\r\n\r\n");
     // Listen to input and route using JACK
     register_shutdown_function('shutdown');
-    passthru("/home/broadcast/switch_input --sleep vlc >/dev/null &");
-    passthru("exec cvlc -A jack - --no-jack-auto-connect --play-and-exit");
+    passthru("/home/broadcast/tools/switch_input --sleep live >/dev/null &");
+    passthru("exec cvlc -A jack - --no-jack-auto-connect --file-caching 1500 --play-and-exit");
 } else {
     print(
         "HTTP/1.0 400 Bad Request\r\n\r\n<!doctype html>\n<html lang=en>".
